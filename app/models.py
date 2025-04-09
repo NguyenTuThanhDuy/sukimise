@@ -138,13 +138,13 @@ class Product(Audit):
         return self.product_name
 
     @classmethod
-    def search_product_description_embedding(self, embedding: list[float], text_query: str):
+    def search_product_description_embedding(cls, embedding: list[float], text_query: str):
         products_with_description = Product.objects.get_queryset().annotate(
             distance=CosineDistance("product_description_vector", embedding),
             search=SearchVector("product_description")
         ).filter(
             Q(search=SearchQuery(text_query)) | Q(distance__lt=0.4)
-        ).select_related("brand").prefetch_related("collections", "suppliers").all()
+        ).select_related("brand").prefetch_related("collections", "suppliers")
         return products_with_description
 
     class Meta:
