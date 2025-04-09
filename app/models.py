@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import Q
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVector, SearchQuery
 from pgvector.django import CosineDistance
@@ -139,14 +139,12 @@ class Product(Audit):
 
     @classmethod
     def search_product_description_embedding(self, embedding: list[float], text_query: str):
-        columns = ["product_id", "product_name"]
-        columns_with_alias = {"product_desc": F("product_description")}
-        products_with_description = Product.objects.values("product_id").annotate(
+        products_with_description = Product.objects.get_queryset().annotate(
             distance=CosineDistance("product_description_vector", embedding),
             search=SearchVector("product_description")
         ).filter(
             Q(search=SearchQuery(text_query)) | Q(distance__lt=0.4)
-        ).values(*columns, **columns_with_alias)
+        ).select_related("brand").prefetch_related("collections", "suppliers").all()
         return products_with_description
 
     class Meta:
