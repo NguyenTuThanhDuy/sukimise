@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.http.request import HttpRequest
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -112,11 +113,17 @@ class BrandDetailView(APIView):
 
 class ProductListView(APIView):
 
-    def get(self, request):
-        if not "input_text" in request.data:
+    def get(self, request: HttpRequest):
+        search_text = request.GET.get("search", "").strip()
+
+        if not search_text:
             products = Product.objects.all()
-        products = Product.search_product_description_embedding(
-            EmbeddingVector().create_embedding_vector(input_text=request.data.get("input_text")))
+        else:
+            products = Product.search_product_description_embedding(
+                EmbeddingVector().create_embedding_vector(input_text=search_text),
+                search_text
+            )
+
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

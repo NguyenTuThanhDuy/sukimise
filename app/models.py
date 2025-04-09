@@ -1,5 +1,7 @@
 from django.db import models
+from django.db.models import F, Q
 from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector, SearchQuery
 from pgvector.django import CosineDistance
 from pgvector.django.vector import VectorField
 from pgvector.django.indexes import HnswIndex
@@ -26,7 +28,7 @@ class BrandManager(models.Manager):
 class Brand(Audit):
     brand_id = models.AutoField(primary_key=True, help_text="brand id")
     brand_name = models.CharField(unique=True, max_length=100)
-    brand_description = models.CharField(max_length=512)
+    brand_description = models.TextField()
     active = models.BooleanField(default=True)
 
     objects = BrandManager()
@@ -58,7 +60,7 @@ class CollectionManager(models.Manager):
 class Collection(Audit):
     collection_id = models.AutoField(primary_key=True, help_text="collection id")
     collection_name = models.CharField(unique=True, max_length=100)
-    collection_description = models.CharField(max_length=512)
+    collection_description = models.CharField(max_length=256)
     active = models.BooleanField(default=True)
 
     objects = CollectionManager()
@@ -90,7 +92,7 @@ class SupplierManager(models.Manager):
 class Supplier(Audit):
     supplier_id = models.AutoField(primary_key=True, help_text="supplier id")
     supplier_name = models.CharField(unique=True, max_length=100)
-    supplier_description = models.CharField(max_length=512)
+    supplier_description = models.CharField(max_length=256)
     active = models.BooleanField(default=True)
 
     objects = SupplierManager()
@@ -122,7 +124,7 @@ class ProductManager(models.Manager):
 class Product(Audit):
     product_id = models.AutoField(primary_key=True, help_text="product id")
     product_name = models.CharField(unique=True, max_length=100)
-    product_description = models.CharField(max_length=512)
+    product_description = models.TextField()
     product_description_vector = VectorField(dimensions=N_DIM)
     collections = models.ManyToManyField(Collection, through="ProductCollection")
     suppliers = models.ManyToManyField(Supplier, through="ProductSupplier")
@@ -136,10 +138,15 @@ class Product(Audit):
         return self.product_name
 
     @classmethod
-    def search_product_description_embedding(self, embedding):
-        products_with_description = Product.objects.annotate(
-            distance=CosineDistance("product_description_vector", embedding)
-        ).filter(distance__lt=0.4).order_by("distance")[:5]
+    def search_product_description_embedding(self, embedding: list[float], text_query: str):
+        columns = ["product_id", "product_name"]
+        columns_with_alias = {"product_desc": F("product_description")}
+        products_with_description = Product.objects.values("product_id").annotate(
+            distance=CosineDistance("product_description_vector", embedding),
+            search=SearchVector("product_description")
+        ).filter(
+            Q(search=SearchQuery(text_query)) | Q(distance__lt=0.4)
+        ).values(*columns, **columns_with_alias)
         return products_with_description
 
     class Meta:
