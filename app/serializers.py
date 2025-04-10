@@ -130,12 +130,11 @@ class ProductSerializer(serializers.ModelSerializer):
     supplier_ids = serializers.PrimaryKeyRelatedField(
         queryset=Supplier.objects.all(),
         many=True, write_only=True, source='suppliers', required=False)
-    created_at = serializers.DateTimeField(read_only=True)
-    updated_at = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Product
-        fields = "__all__"
+        exclude = ["created_at", "updated_at"]
+        read_only_fields = ["product_id"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -144,7 +144,7 @@ class Product(Audit):
             search=SearchVector("product_description")
         ).filter(
             Q(search=SearchQuery(text_query)) | Q(distance__lt=0.4)
-        ).select_related("brand").prefetch_related("collections", "suppliers")
+        ).select_related("brand").prefetch_related("collections", "suppliers").order_by("distance")
         return products_with_description
 
     class Meta:
