@@ -19,7 +19,7 @@ class Audit(models.Model):
         abstract = True
 
 
-class BrandManager(models.Manager):
+class ActiveRecordManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().filter(active=True)
@@ -29,9 +29,9 @@ class Brand(Audit):
     brand_id = models.AutoField(primary_key=True, help_text="brand id")
     brand_name = models.CharField(unique=True, max_length=100)
     brand_description = models.TextField()
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, db_index=True)
 
-    objects = BrandManager()
+    objects = ActiveRecordManager()
     all_objects = models.Manager()
 
     def __str__(self):
@@ -51,19 +51,13 @@ class Brand(Audit):
         ]
 
 
-class CollectionManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset().filter(active=True)
-
-
 class Collection(Audit):
     collection_id = models.AutoField(primary_key=True, help_text="collection id")
     collection_name = models.CharField(unique=True, max_length=100)
     collection_description = models.CharField(max_length=256)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, db_index=True)
 
-    objects = CollectionManager()
+    objects = ActiveRecordManager()
     all_objects = models.Manager()
 
     def __str__(self):
@@ -83,19 +77,13 @@ class Collection(Audit):
         ]
 
 
-class SupplierManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset().filter(active=True)
-
-
 class Supplier(Audit):
     supplier_id = models.AutoField(primary_key=True, help_text="supplier id")
     supplier_name = models.CharField(unique=True, max_length=100)
     supplier_description = models.CharField(max_length=256)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, db_index=True)
 
-    objects = SupplierManager()
+    objects = ActiveRecordManager()
     all_objects = models.Manager()
 
     def __str__(self):
@@ -115,12 +103,6 @@ class Supplier(Audit):
         ]
 
 
-class ProductManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset().filter(active=True)
-
-
 class Product(Audit):
     product_id = models.AutoField(primary_key=True, help_text="product id")
     product_name = models.CharField(unique=True, max_length=100)
@@ -129,9 +111,9 @@ class Product(Audit):
     collections = models.ManyToManyField(Collection, through="ProductCollection")
     suppliers = models.ManyToManyField(Supplier, through="ProductSupplier")
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="products")
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, db_index=True)
 
-    objects = ProductManager()
+    objects = ActiveRecordManager()
     all_objects = models.Manager()
 
     def __str__(self):
@@ -139,7 +121,7 @@ class Product(Audit):
 
     @classmethod
     def search_product_description_embedding(cls, embedding: list[float], text_query: str):
-        products_with_description = Product.objects.get_queryset().annotate(
+        products_with_description = Product.objects.annotate(
             distance=CosineDistance("product_description_vector", embedding),
             search=SearchVector("product_description")
         ).filter(
@@ -177,6 +159,7 @@ class ProductCollection(models.Model):
 
     class Meta:
         db_table = "ms_app_product_collection"
+        unique_together = ("product", "collection")
 
 
 class ProductSupplier(models.Model):
@@ -188,3 +171,4 @@ class ProductSupplier(models.Model):
 
     class Meta:
         db_table = "ms_app_product_supplier"
+        unique_together = ("product", "supplier")
