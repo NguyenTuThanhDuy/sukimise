@@ -125,9 +125,13 @@ class Product(Audit):
             distance=CosineDistance("product_description_vector", embedding),
             search=SearchVector("product_description")
         ).filter(
-            Q(search=SearchQuery(text_query)) | Q(distance__lt=0.4)
+            cls.generate_vector_search_stmt(text_query)
         ).select_related("brand").prefetch_related("collections", "suppliers").order_by("distance")
         return products_with_description
+
+    @classmethod
+    def generate_vector_search_stmt(cls, text_query: str):
+        return Q(search=SearchQuery(text_query)) | Q(distance__lt=0.4)
 
     class Meta:
         verbose_name = "Product"

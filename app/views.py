@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.http.request import HttpRequest
+from django.db.models.query import QuerySet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,13 +12,13 @@ from app.embedding import EmbeddingVector
 
 class CollectionListView(APIView):
 
-    def get(self, request, format=None):
+    def get(self, request: HttpRequest, format=None):
         collections = Collection.objects.all()
         serializer = CollectionSerializer(collections, many=True)
         return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = CollectionSerializer(data=request.data)
+    def post(self, request: HttpRequest, format=None):
+        serializer = CollectionSerializer(data=request.body)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -38,20 +39,20 @@ class CollectionDetailView(APIView):
         except Collection.DoesNotExist:
             raise Http404(f"Collection ID: {pk} does not exist")
 
-    def get(self, request, pk, format=None):
+    def get(self, request: HttpRequest, pk: int, format=None):
         collection = self.get_active_object(pk)
         serializer = CollectionSerializer(collection)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request: HttpRequest, pk: int, format=None):
         collection = self.get_all_type_object(pk)
-        serializer = CollectionSerializer(collection, data=request.data)
+        serializer = CollectionSerializer(collection, data=request.body)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+    def delete(self, request: HttpRequest, pk: int, format=None):
         collection = self.get_all_type_object(pk)
         serializer = CollectionSerializer(collection, {"active": False})
         if serializer.is_valid():
@@ -62,13 +63,13 @@ class CollectionDetailView(APIView):
 
 class BrandListView(APIView):
 
-    def get(self, request, format=None):
+    def get(self, request: HttpRequest, format=None):
         brands = Brand.objects.all()
         serializer = BrandSerializer(brands, many=True)
         return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = BrandSerializer(data=request.data)
+    def post(self, request: HttpRequest, format=None):
+        serializer = BrandSerializer(data=request.body)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -89,20 +90,20 @@ class BrandDetailView(APIView):
         except Brand.DoesNotExist:
             raise Http404(f"Brand ID: {pk} does not exist")
 
-    def get(self, request, pk, format=None):
+    def get(self, request: HttpRequest, pk: int, format=None):
         brand = self.get_active_object(pk)
         serializer = BrandSerializer(brand)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request: HttpRequest, pk: int, format=None):
         brand = self.get_all_type_object(pk)
-        serializer = BrandSerializer(brand, data=request.data)
+        serializer = BrandSerializer(brand, data=request.body)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+    def delete(self, request: HttpRequest, pk: int, format=None):
         brand = self.get_all_type_object(pk)
         serializer = BrandSerializer(brand, {"active": False})
         if serializer.is_valid():
@@ -127,8 +128,8 @@ class ProductListView(APIView):
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data)
+    def post(self, request: HttpRequest):
+        serializer = ProductSerializer(data=request.body)
         if serializer.is_valid():
             product = serializer.save()
 
@@ -152,20 +153,20 @@ class ProductDetailView(APIView):
         except Product.DoesNotExist:
             raise Http404(f"Product ID: {pk} does not exist")
 
-    def get(self, request, pk, format=None):
+    def get(self, request: HttpRequest, pk: int, format=None):
         product = self.get_active_object(pk)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request: HttpRequest, pk: int, format=None):
         product = self.get_all_type_object(pk)
-        serializer = ProductSerializer(product, data=request.data)
+        serializer = ProductSerializer(product, data=request.body)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+    def delete(self, request: HttpRequest, pk: int, format=None):
         product = self.get_all_type_object(pk)
         serializer = ProductSerializer(product, {"active": False})
         if serializer.is_valid():
