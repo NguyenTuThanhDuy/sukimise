@@ -1,6 +1,6 @@
+import json
 from django.http import Http404
 from django.http.request import HttpRequest
-from django.db.models.query import QuerySet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +8,8 @@ from rest_framework import status
 from app.models import Collection, Brand, Product
 from app.serializers import CollectionSerializer, BrandSerializer, ProductSerializer
 from app.embedding import EmbeddingVector
+from app.product_cache import ProductCache
+from app.vector_search import ProductSearch
 
 
 class CollectionListView(APIView):
@@ -18,7 +20,8 @@ class CollectionListView(APIView):
         return Response(serializer.data)
 
     def post(self, request: HttpRequest, format=None):
-        serializer = CollectionSerializer(data=request.body)
+        data = json.loads(request.body)
+        serializer = CollectionSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -46,7 +49,8 @@ class CollectionDetailView(APIView):
 
     def put(self, request: HttpRequest, pk: int, format=None):
         collection = self.get_all_type_object(pk)
-        serializer = CollectionSerializer(collection, data=request.body)
+        data = json.loads(request.body)
+        serializer = CollectionSerializer(collection, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -69,7 +73,8 @@ class BrandListView(APIView):
         return Response(serializer.data)
 
     def post(self, request: HttpRequest, format=None):
-        serializer = BrandSerializer(data=request.body)
+        data = json.loads(request.body)
+        serializer = BrandSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -97,7 +102,8 @@ class BrandDetailView(APIView):
 
     def put(self, request: HttpRequest, pk: int, format=None):
         brand = self.get_all_type_object(pk)
-        serializer = BrandSerializer(brand, data=request.body)
+        data = json.loads(request.body)
+        serializer = BrandSerializer(brand, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -116,20 +122,21 @@ class ProductListView(APIView):
 
     def get(self, request: HttpRequest):
         search_text = request.GET.get("search", "").strip()
-
-        if not search_text:
-            products = Product.objects.all()
-        else:
-            products = Product.search_product_description_embedding(
+        if search_text:
+            products = ProductSearch.search_from_cached(
+                ProductCache.get_products(),
                 EmbeddingVector().create_embedding_vector(input_text=search_text),
                 search_text
             )
+        else:
+            products = ProductCache.get_products()
 
-        serializer = ProductSerializer(products, many=True)
+        serializer = ProductSerializer(products.values(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request: HttpRequest):
-        serializer = ProductSerializer(data=request.body)
+        data = json.loads(request.body)
+        serializer = ProductSerializer(data=data)
         if serializer.is_valid():
             product = serializer.save()
 
@@ -160,7 +167,8 @@ class ProductDetailView(APIView):
 
     def put(self, request: HttpRequest, pk: int, format=None):
         product = self.get_all_type_object(pk)
-        serializer = ProductSerializer(product, data=request.body)
+        data = json.loads(request.body)
+        serializer = ProductSerializer(product, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

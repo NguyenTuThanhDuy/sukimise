@@ -118,9 +118,9 @@ class ProductSerializer(serializers.ModelSerializer):
     product_description_vector = serializers.ListField(required=False, write_only=True)
     distance = serializers.FloatField(required=False)
     active = serializers.BooleanField(required=False)
-    brand = BrandSerializer(read_only=True)
-    collections = CollectionSerializer(many=True, read_only=True)
-    suppliers = SupplierSerializer(many=True, read_only=True)
+    # brand = BrandSerializer(read_only=True)
+    # collections = CollectionSerializer(many=True, read_only=True)
+    # suppliers = SupplierSerializer(many=True, read_only=True)
     brand_id = serializers.PrimaryKeyRelatedField(
         queryset=Brand.objects.all(),
         write_only=True, source='brand', required=False)

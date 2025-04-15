@@ -13,6 +13,7 @@ class BaseCache:
 
     @classmethod
     def set_data(cls, key: str, data):
+        cls.queryset = data
         cache.set(key, data, cls.ttl)
 
     @classmethod
