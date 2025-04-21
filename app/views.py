@@ -126,7 +126,6 @@ class ProductListView(APIView):
             products = ProductSearch.search_from_cached(
                 ProductCache.get_products(),
                 EmbeddingVector().create_embedding_vector(input_text=search_text),
-                search_text
             )
         else:
             products = ProductCache.get_products()
