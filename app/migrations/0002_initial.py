@@ -5,8 +5,8 @@ import django.db.models.deletion
 import django.db.models.manager
 import pgvector.django.indexes
 import pgvector.django.vector
-from django.db import migrations, models
 from django.contrib.postgres.operations import BtreeGinExtension
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

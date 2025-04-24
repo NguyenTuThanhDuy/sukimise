@@ -1,0 +1,9 @@
+.tox
+.git
+*/migrations/*
+*/static/CACHE/*
+docs
+node_modules
+venv
+.venv
+*/tests/*

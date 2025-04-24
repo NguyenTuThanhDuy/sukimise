@@ -1,10 +1,6 @@
-from rest_framework import serializers
-from app.models import Collection, Brand, Product, Supplier
 from app.embedding import EmbeddingVector
-
-
+from app.models import Brand, Collection, Product, Supplier
 from rest_framework import serializers
-from .models import Collection, Brand, Supplier
 
 
 class CollectionSerializer(serializers.ModelSerializer):
@@ -13,23 +9,23 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = ['collection_id', 'collection_name', 'collection_description', 'active']
-        read_only_fields = ['collection_id']
+        fields = ["collection_id", "collection_name", "collection_description", "active"]
+        read_only_fields = ["collection_id"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if self.instance is None:
-            self.fields['collection_name'].required = True
-            self.fields['collection_description'].required = True
+            self.fields["collection_name"].required = True
+            self.fields["collection_description"].required = True
 
     def update(self, instance: Collection, validated_data: dict):
         """
         If the field is not provided, keep the existing value.
         """
-        collection_name = validated_data.get('collection_name', instance.collection_name)
-        collection_description = validated_data.get('collection_description', instance.collection_description)
-        active = validated_data.get('active', instance.active)
+        collection_name = validated_data.get("collection_name", instance.collection_name)
+        collection_description = validated_data.get("collection_description", instance.collection_description)
+        active = validated_data.get("active", instance.active)
 
         instance.collection_name = collection_name
         instance.collection_description = collection_description
@@ -48,23 +44,23 @@ class BrandSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Brand
-        fields = ['brand_id', 'brand_name', 'brand_description', 'active']
-        read_only_fields = ['brand_id']
+        fields = ["brand_id", "brand_name", "brand_description", "active"]
+        read_only_fields = ["brand_id"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if self.instance is None:
-            self.fields['brand_name'].required = True
-            self.fields['brand_description'].required = True
+            self.fields["brand_name"].required = True
+            self.fields["brand_description"].required = True
 
     def update(self, instance: Brand, validated_data: dict):
         """
         If the field is not provided, keep the existing value.
         """
-        brand_name = validated_data.get('brand_name', instance.brand_name)
-        brand_description = validated_data.get('brand_description', instance.brand_description)
-        active = validated_data.get('active', instance.active)
+        brand_name = validated_data.get("brand_name", instance.brand_name)
+        brand_description = validated_data.get("brand_description", instance.brand_description)
+        active = validated_data.get("active", instance.active)
 
         instance.brand_name = brand_name
         instance.brand_description = brand_description
@@ -83,23 +79,23 @@ class SupplierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Supplier
-        fields = ['supplier_id', 'supplier_name', 'supplier_description', 'active']
-        read_only_fields = ['supplier_id']
+        fields = ["supplier_id", "supplier_name", "supplier_description", "active"]
+        read_only_fields = ["supplier_id"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if self.instance is None:
-            self.fields['supplier_name'].required = True
-            self.fields['supplier_description'].required = True
+            self.fields["supplier_name"].required = True
+            self.fields["supplier_description"].required = True
 
     def update(self, instance: Supplier, validated_data: dict):
         """
         If the field is not provided, keep the existing value.
         """
-        supplier_name = validated_data.get('supplier_name', instance.supplier_name)
-        supplier_description = validated_data.get('supplier_description', instance.supplier_description)
-        active = validated_data.get('active', instance.active)
+        supplier_name = validated_data.get("supplier_name", instance.supplier_name)
+        supplier_description = validated_data.get("supplier_description", instance.supplier_description)
+        active = validated_data.get("active", instance.active)
 
         instance.supplier_name = supplier_name
         instance.supplier_description = supplier_description
@@ -122,14 +118,14 @@ class ProductSerializer(serializers.ModelSerializer):
     # collections = CollectionSerializer(many=True, read_only=True)
     # suppliers = SupplierSerializer(many=True, read_only=True)
     brand_id = serializers.PrimaryKeyRelatedField(
-        queryset=Brand.objects.all(),
-        write_only=True, source='brand', required=False)
+        queryset=Brand.objects.all(), write_only=True, source="brand", required=False
+    )
     collection_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Collection.objects.all(),
-        many=True, write_only=True, source='collections', required=False)
+        queryset=Collection.objects.all(), many=True, write_only=True, source="collections", required=False
+    )
     supplier_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Supplier.objects.all(),
-        many=True, write_only=True, source='suppliers', required=False)
+        queryset=Supplier.objects.all(), many=True, write_only=True, source="suppliers", required=False
+    )
 
     class Meta:
         model = Product
@@ -140,12 +136,13 @@ class ProductSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
         if self.instance is None:
-            self.fields['product_name'].required = True
-            self.fields['product_description'].required = True
+            self.fields["product_name"].required = True
+            self.fields["product_description"].required = True
 
     def create(self, validated_data: dict):
-        validated_data['product_description_vector'] = EmbeddingVector().create_embedding_vector(
-            input_text=validated_data.get('product_description'))
+        validated_data["product_description_vector"] = EmbeddingVector().create_embedding_vector(
+            input_text=validated_data.get("product_description")
+        )
         collections = validated_data.pop("collections", [])
         suppliers = validated_data.pop("suppliers", [])
         product = Product.objects.create(**validated_data)
@@ -163,7 +160,9 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.brand = validated_data.get("brand", instance.brand)
 
         if "product_description" in validated_data:
-            description_vector = EmbeddingVector().create_embedding_vector(input_text=validated_data.get('product_description'))
+            description_vector = EmbeddingVector().create_embedding_vector(
+                input_text=validated_data.get("product_description")
+            )
             instance.product_description_vector = description_vector
         else:
             instance.product_description_vector = validated_data.get(

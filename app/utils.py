@@ -1,8 +1,9 @@
 import re
 from functools import wraps
+from typing import Any, Callable
 
 
-def preprocess_text_decorator(func):
+def preprocess_text_decorator(func: Callable) -> Callable:
     """
     A decorator that preprocesses the input text before passing it to the actual function.
     It:
@@ -13,7 +14,7 @@ def preprocess_text_decorator(func):
     """
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: list, **kwargs: dict) -> Any:
         txt = kwargs.get("input_text")
         # Preprocess the text
         if not isinstance(txt, str):

@@ -1,7 +1,9 @@
-from django.db import models
+from typing import ClassVar
+
 from django.contrib.postgres.indexes import GinIndex
-from pgvector.django.vector import VectorField
+from django.db import models
 from pgvector.django.indexes import HnswIndex
+from pgvector.django.vector import VectorField
 
 # Create your models here.
 N_DIM = 512
@@ -28,8 +30,8 @@ class Brand(Audit):
     brand_description = models.TextField()
     active = models.BooleanField(default=True, db_index=True)
 
-    objects = ActiveRecordManager()
-    all_objects = models.Manager()
+    objects: ClassVar[ActiveRecordManager] = ActiveRecordManager()
+    all_objects: ClassVar[models.Manager] = models.Manager()
 
     def __str__(self):
         return self.brand_name
@@ -40,12 +42,10 @@ class Brand(Audit):
         db_table = "ms_app_brand"
         ordering = ["brand_id", "brand_name"]
         default_manager_name = "all_objects"
-        indexes = [
-            GinIndex(
-                name="brand_name_gin_idx",
-                fields=["brand_name", "brand_description"],
-            )
-        ]
+        indexes = [GinIndex(
+            name="brand_name_gin_idx",
+            fields=["brand_name", "brand_description"],
+        )]
 
 
 class Collection(Audit):
@@ -54,8 +54,8 @@ class Collection(Audit):
     collection_description = models.CharField(max_length=256)
     active = models.BooleanField(default=True, db_index=True)
 
-    objects = ActiveRecordManager()
-    all_objects = models.Manager()
+    objects: ClassVar[ActiveRecordManager] = ActiveRecordManager()
+    all_objects: ClassVar[models.Manager] = models.Manager()
 
     def __str__(self):
         return self.collection_name
@@ -66,12 +66,10 @@ class Collection(Audit):
         db_table = "ms_app_collection"
         ordering = ["collection_id", "collection_name"]
         default_manager_name = "all_objects"
-        indexes = [
-            GinIndex(
-                name="collection_name_gin_idx",
-                fields=["collection_name", "collection_description"],
-            )
-        ]
+        indexes = [GinIndex(
+            name="collection_name_gin_idx",
+            fields=["collection_name", "collection_description"],
+        )]
 
 
 class Supplier(Audit):
@@ -80,8 +78,8 @@ class Supplier(Audit):
     supplier_description = models.CharField(max_length=256)
     active = models.BooleanField(default=True, db_index=True)
 
-    objects = ActiveRecordManager()
-    all_objects = models.Manager()
+    objects: ClassVar[ActiveRecordManager] = ActiveRecordManager()
+    all_objects: ClassVar[models.Manager] = models.Manager()
 
     def __str__(self):
         return self.supplier_name
@@ -92,12 +90,10 @@ class Supplier(Audit):
         db_table = "ms_app_supplier"
         ordering = ["supplier_id", "supplier_name"]
         default_manager_name = "all_objects"
-        indexes = [
-            GinIndex(
-                name="supplier_name_gin_idx",
-                fields=["supplier_name", "supplier_description"],
-            )
-        ]
+        indexes = [GinIndex(
+            name="supplier_name_gin_idx",
+            fields=["supplier_name", "supplier_description"],
+        )]
 
 
 class Product(Audit):
@@ -105,13 +101,13 @@ class Product(Audit):
     product_name = models.CharField(unique=True, max_length=100)
     product_description = models.TextField()
     product_description_vector = VectorField(dimensions=N_DIM)
-    collections = models.ManyToManyField(Collection, through="ProductCollection")
-    suppliers = models.ManyToManyField(Supplier, through="ProductSupplier")
+    collections: ClassVar[models.ManyToManyField] = models.ManyToManyField(Collection, through="ProductCollection")
+    suppliers: ClassVar[models.ManyToManyField] = models.ManyToManyField(Supplier, through="ProductSupplier")
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="products")
     active = models.BooleanField(default=True, db_index=True)
 
-    objects = ActiveRecordManager()
-    all_objects = models.Manager()
+    objects: ClassVar[ActiveRecordManager] = ActiveRecordManager()
+    all_objects: ClassVar[models.Manager] = models.Manager()
 
     def __str__(self):
         return self.product_name
@@ -128,12 +124,12 @@ class Product(Audit):
                 fields=["product_description_vector"],
                 m=32,
                 ef_construction=100,
-                opclasses=["vector_cosine_ops"]
+                opclasses=["vector_cosine_ops"],
             ),
             GinIndex(
                 name="product_name_gin_idx",
                 fields=["product_name", "product_description"],
-            )
+            ),
         ]
 
 

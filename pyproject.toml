@@ -1,0 +1,40 @@
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | venv
+  | \.env
+  | \.flake8
+  | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+known_third_party = [""]  # Add other third-party libraries as needed
+src_paths = ["src", "apps"]  # Adjust paths as per your project structure
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203", "W503"]  # For compatibility with Black (optional)
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = "[a-zA-Z_]+.migrations.|[a-zA-Z_]+.tests.|[a-zA-Z_]+.testing."
+allow_redefinition = false
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "mise.settings"

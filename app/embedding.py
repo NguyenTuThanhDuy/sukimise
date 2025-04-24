@@ -1,25 +1,25 @@
-from abc import ABC, abstractmethod
 import logging
-
-from langchain_openai.embeddings.base import OpenAIEmbeddings
-from openai import OpenAIError
+from abc import ABC, abstractmethod
 
 from app.config import BaseConfig as Conf
 from app.utils import preprocess_text_decorator
-
+from langchain_openai.embeddings.base import OpenAIEmbeddings
+from openai import OpenAIError
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
 class IEmbeddingVector(ABC):
+
     @abstractmethod
     def create_embedding_vector(self, input_text: str):
         raise NotImplementedError()
 
 
 class EmbeddingVector(IEmbeddingVector):
-    def __init__(self):
+
+    def __init__(self) -> None:
         self.embed = OpenAIEmbeddings(
             api_key=Conf.OPENAI_API_KEY,
             model=Conf.OPENAI_EMBEDDING_MODEL,

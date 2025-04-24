@@ -1,10 +1,8 @@
 from typing import Dict, List
 
-import numpy as np
 import faiss
-
+import numpy as np
 from app.models import Product
-
 
 N_DIM = 512
 TOP_K = 3
@@ -27,7 +25,8 @@ class ProductSearch:
 
     @classmethod
     def search_from_cached(
-        cls, products: Dict[int, Product],
+        cls,
+        products: Dict[int, Product],
         embedding: List[float],
     ):
         filtered = {}
