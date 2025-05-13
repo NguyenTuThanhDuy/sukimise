@@ -134,8 +134,8 @@ class Product(Audit):
 
 
 class ProductCollection(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    product: Product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    collection: Collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"{self.product.product_name} {self.collection.collection_name}"
@@ -146,8 +146,8 @@ class ProductCollection(models.Model):
 
 
 class ProductSupplier(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    product: Product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    supplier: Supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"{self.product.product_name} {self.supplier.supplier_name}"

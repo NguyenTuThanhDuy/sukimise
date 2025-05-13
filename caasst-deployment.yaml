@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caasst-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: caasst-backend
+  template:
+    metadata:
+      labels:
+        app: caasst-backend
+    spec:
+      containers:
+        - name: caasst-backend
+          image: caasst_be:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AWS_PROFILE
+              value: opetech_vt  # Change this to your actual profile name
+          volumeMounts:
+            - name: aws-credentials
+              mountPath: /root/.aws
+      volumes:
+        - name: aws-credentials
+          secret:
+            secretName: aws-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caasst-backend
+spec:
+  selector:
+    app: caasst-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: NodePort

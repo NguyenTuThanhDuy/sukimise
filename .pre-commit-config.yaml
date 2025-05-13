@@ -1,4 +1,4 @@
-exclude: "^docs/|/migrations/|/.vscode/"
+exclude: "^docs/|/migrations/|/.vscode/|[^/]*.yaml$"
 default_stages: [pre-commit]
 
 repos:
