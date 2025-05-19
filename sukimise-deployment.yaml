@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sukimise-backend
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: sukimise-backend
+  template:
+    metadata:
+      labels:
+        app: sukimise-backend
+    spec:
+      containers:
+        - name: sukimise-backend
+          image: sukimise:v3
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          # resources:
+          #   requests:
+          #     memory: "256Mi"
+          #     cpu: "250m"
+          #   limits:
+          #     memory: "512Mi"
+          #     cpu: "500m"
+          env:
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: POSTGRES_DB
+            - name: POSTGRES_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: POSTGRES_HOST
+            - name: POSTGRES_DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: POSTGRES_PORT
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: REDIS_PORT
+            - name: REDIS_DB
+              valueFrom:
+                secretKeyRef:
+                  name: sukimise-secret
+                  key: REDIS_DB
+          readinessProbe:
+            httpGet:
+              httpHeaders:
+              - name: HOST
+                value: localhost
+              path: /sukimise/healthcheck
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              httpHeaders:
+              - name: HOST
+                value: localhost
+              path: /sukimise/healthcheck
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sukimise-backend
+spec:
+  selector:
+    app: sukimise-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: NodePort

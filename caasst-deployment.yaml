@@ -4,6 +4,7 @@ metadata:
   name: caasst-backend
 spec:
   replicas: 1
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: caasst-backend
@@ -14,16 +15,38 @@ spec:
     spec:
       containers:
         - name: caasst-backend
-          image: caasst_be:latest
+          image: caasst_be:v4
           imagePullPolicy: Never
           ports:
             - containerPort: 8000
+          # resources:
+          #   requests:
+          #     memory: "256Mi"
+          #     cpu: "250m"
+          #   limits:
+          #     memory: "512Mi"
+          #     cpu: "500m"
           env:
             - name: AWS_PROFILE
               value: opetech_vt  # Change this to your actual profile name
           volumeMounts:
             - name: aws-credentials
               mountPath: /root/.aws
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health-check
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health-check
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 3
       volumes:
         - name: aws-credentials
           secret:

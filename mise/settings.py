@@ -20,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 env.read_env(str(BASE_DIR / ".env"))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -30,8 +29,7 @@ SECRET_KEY = "django-insecure-pi@nw4f&7nuc$&5#541gl&0n3px=^7x!16d-^l8w%&)h+hh-l+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: list[str] = []
-
+ALLOWED_HOSTS: list[str] = ["*"]
 
 # Application definition
 
@@ -75,21 +73,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "mise.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "sukimise",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "localhost",  # or 'localhost' for local
-        "PORT": "5432",
+        "NAME": env.get_value("POSTGRES_DB_NAME"),
+        "USER": env.get_value("POSTGRES_DB_USER"),
+        "PASSWORD": env.get_value("POSTGRES_DB_PASSWORD"),
+        "HOST": env.get_value("POSTGRES_DB_HOST"),  # or 'localhost' for local
+        "PORT": env.get_value("POSTGRES_DB_PORT"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -109,7 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -121,7 +116,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -132,11 +126,12 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",  # Use the appropriate Redis server URL
+        "LOCATION":
+            f"redis://{env.get_value('REDIS_HOST')}:\
+                {env.get_value('REDIS_PORT')}/{env.get_value('REDIS_DB')}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {
@@ -150,3 +145,5 @@ CACHES = {
 # Optional: This is to ensure Django sessions are stored in Redis
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+
+APPEND_SLASH = True

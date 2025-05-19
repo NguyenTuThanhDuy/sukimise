@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx
+  namespace: devops-tools
 spec:
   replicas: 1
   revisionHistoryLimit: 1
@@ -32,6 +33,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx-config
+  namespace: devops-tools
 data:
   nginx.conf: |
     events {
@@ -39,11 +41,8 @@ data:
     }
 
     http {
-      upstream caasst_be {
-        server caasst-backend:8000;
-      }
-      upstream sukimise_be {
-        server sukimise-backend:8000;
+      upstream jenkins {
+        server jenkins-service:8080;
       }
 
       include       mime.types;
@@ -71,22 +70,7 @@ data:
         limit_req zone=req_limit_per_ip burst=200 nodelay;
 
         location / {
-          proxy_pass http://caasst_be;
-          proxy_http_version 1.1;
-
-          # Forward headers
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-
-          # WebSocket support (optional, if used)
-          proxy_set_header Upgrade $http_upgrade;
-          proxy_set_header Connection "upgrade";
-        }
-
-        location /sukimise/ {
-          proxy_pass http://sukimise_be;
+          proxy_pass http://jenkins;
           proxy_http_version 1.1;
 
           # Forward headers
@@ -131,6 +115,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
+  namespace: devops-tools
 spec:
   ports:
     - port: 80
