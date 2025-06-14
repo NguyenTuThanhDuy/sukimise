@@ -4,3 +4,4 @@ __pycache__
 .venv
 redis-data
 postgres_data
+neo4j
