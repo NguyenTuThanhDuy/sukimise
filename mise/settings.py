@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "app",
     "rest_framework",
+    "django_neomodel"
 ]
 
 MIDDLEWARE = [
@@ -147,3 +148,5 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
 APPEND_SLASH = True
+
+NEOMODEL_NEO4J_BOLT_URL = env.get_value('NEO4J_BOLT_URL')

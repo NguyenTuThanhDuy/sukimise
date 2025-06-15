@@ -319,6 +319,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-neomodel"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "neomodel" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b0/c2/46e9ab2a76f7e006c4955abc0ad7c70f3db5d48bcd60d9b0ac368403c911/django_neomodel-0.2.0.tar.gz", hash = "sha256:8b4fb95924df227b323937ea7991337f7385739df5e0fbda820e0da0f4fa119a", size = 24329, upload-time = "2024-05-22T12:42:18.331Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ca/19/2f00a8c94b3c5c11cb0d7098adc1ef1f1baec6aad5575e9542ddb20d5a82/django_neomodel-0.2.0-py3-none-any.whl", hash = "sha256:0a1aab1bcf9f8882af6bae785e7cb8296db14e956de547857a9cbf3347230646", size = 18156, upload-time = "2024-05-22T12:42:17.193Z" },
+]
+
+[[package]]
 name = "django-redis"
 version = "5.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -879,26 +892,23 @@ wheels = [
 
 [[package]]
 name = "neo4j"
-version = "5.28.1"
+version = "5.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytz" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4b/20/733dac16f7cedc80b23093415822c9763302519cba0e7c8bcdb5c01fc512/neo4j-5.28.1.tar.gz", hash = "sha256:ae8e37a1d895099062c75bc359b2cce62099baac7be768d0eba7180c1298e214", size = 231094, upload-time = "2025-02-10T08:36:22.566Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6a/57/94225fe5e9dabdc0ff60c88cbfcedf11277f4b34e7ab1373d3e62dbdd207/neo4j-5.28.1-py3-none-any.whl", hash = "sha256:6755ef9e5f4e14b403aef1138fb6315b120631a0075c138b5ddb2a06b87b09fd", size = 312258, upload-time = "2025-02-10T08:36:16.209Z" },
-]
+sdist = { url = "https://files.pythonhosted.org/packages/c3/cf/4d879894f063f9845bd3573cd92517481f470ba27c062cbe5d0e8de69769/neo4j-5.19.0.tar.gz", hash = "sha256:23704f604214174f3b7d15a38653a1462809986019dfdaf773ff7ca4e1b9e2de", size = 202974, upload-time = "2024-04-02T11:18:59.866Z" }
 
 [[package]]
 name = "neomodel"
-version = "5.5.0"
+version = "5.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "neo4j" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d0/3a/02088c615a7bbbcbbf0ae77ab1fbcc7b39d81abc3f2e95d88f571fa92667/neomodel-5.5.0.tar.gz", hash = "sha256:b324b9ff46140d1efcff488584a87ddf3d9f2e991cb0b1e5810d6223a3f5b09e", size = 194227, upload-time = "2025-06-05T11:35:58.834Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/36/a9/b48b639b9a758e0fa4c67e196deeb9aa776c3b5f3012a4ac441050456dd9/neomodel-5.3.3.tar.gz", hash = "sha256:f8e24fbce5d1ccd1966b3bed65ac469243e9b4f14b7e6f11e80d2c9fce450d95", size = 168048, upload-time = "2024-09-23T08:57:40.162Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ca/9c/21ad0829eb2a996f4a1c476f1dca5c7ff069ecc14112cc017da43f23ef6b/neomodel-5.5.0-py3-none-any.whl", hash = "sha256:47eadac6767c1db826bd3a3674e56e203c70142a70907239a56ee141a1bd42b6", size = 229154, upload-time = "2025-06-05T11:35:57.094Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/15/c18558951ac7079f6d89e7a36082eed701ffb8ad901188b7ebdd0617cf95/neomodel-5.3.3-py3-none-any.whl", hash = "sha256:ae1ffc9ac2a50a966a17504e90e9371ae2abc5d21faf07680a07e5657b5c34ab", size = 203435, upload-time = "2024-09-23T08:57:38.307Z" },
 ]
 
 [[package]]
@@ -1528,6 +1538,7 @@ dependencies = [
     { name = "distro" },
     { name = "django" },
     { name = "django-environ" },
+    { name = "django-neomodel" },
     { name = "django-redis" },
     { name = "django-rest-framework" },
     { name = "django-stubs" },
@@ -1554,7 +1565,6 @@ dependencies = [
     { name = "mccabe" },
     { name = "mypy" },
     { name = "mypy-extensions" },
-    { name = "neomodel" },
     { name = "nodeenv" },
     { name = "numpy" },
     { name = "openai" },
@@ -1603,6 +1613,7 @@ requires-dist = [
     { name = "distro", specifier = "==1.9.0" },
     { name = "django", specifier = "==5.2" },
     { name = "django-environ", specifier = "==0.12.0" },
+    { name = "django-neomodel", specifier = ">=0.2.0" },
     { name = "django-redis", specifier = "==5.4.0" },
     { name = "django-rest-framework", specifier = "==0.1.0" },
     { name = "django-stubs", specifier = "==5.1.3" },
@@ -1629,7 +1640,6 @@ requires-dist = [
     { name = "mccabe", specifier = "==0.7.0" },
     { name = "mypy", specifier = "==1.15.0" },
     { name = "mypy-extensions", specifier = "==1.0.0" },
-    { name = "neomodel", specifier = ">=5.5.0" },
     { name = "nodeenv", specifier = "==1.9.1" },
     { name = "numpy", specifier = "==2.2.4" },
     { name = "openai", specifier = "==1.70.0" },
